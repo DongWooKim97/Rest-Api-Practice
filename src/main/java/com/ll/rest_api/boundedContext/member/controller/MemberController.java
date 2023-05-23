@@ -1,10 +1,13 @@
 package com.ll.rest_api.boundedContext.member.controller;
 
+import com.ll.rest_api.base.rsData.RsData;
 import com.ll.rest_api.boundedContext.member.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,12 +30,19 @@ public class MemberController {
         private String password;
     }
 
+    @AllArgsConstructor
+    @Getter
+    public static class LoginReponse {
+        private final String accessToken;
+    }
+
+
     @PostMapping("/login")
-    public String login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse resp) {
+    public RsData<LoginReponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse resp) {
         String accessToken = memberService.genAccessToken(loginRequest.getUsername(), loginRequest.getPassword());
 
         resp.addHeader("Authentication", accessToken);
 
-        return "응답본문";
+        return RsData.of("S-1", "액세스 토큰이 생성되었습니다", new LoginReponse(accessToken));
     }
 }
